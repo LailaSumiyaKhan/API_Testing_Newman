@@ -1,0 +1,298 @@
+{
+	"info": {
+		"_postman_id": "c060d996-a1ad-465f-8a97-80b294b8e7b4",
+		"name": "practice-evershop",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31397093"
+	},
+	"item": [
+		{
+			"name": "search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate status code should be 200\",function(){\r",
+							"    pm.expect(200).to.eql(pm.response.code)\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Validate total item should be 1\",function(){\r",
+							"   \r",
+							"    // console.log(responseBody)\r",
+							"    const totalItem = responseBody.eContext.graphqlResponse.e248uix4m5ibqamd.total\r",
+							"    console.log(totalItem)\r",
+							"    pm.expect(1).to.eql(totalItem)\r",
+							"\r",
+							"})\r",
+							"\r",
+							"pm.test(\"Validate item name should be Nike\",function(){\r",
+							"        const searchedName = responseBody.eContext.graphqlResponse.e248uix4m5ibqamd.currentFilters[0].value;\r",
+							"   \r",
+							"        // console.log(searchedName)\r",
+							"        pm.expect(\"Nike react phantom run flyknit 2 \").to.contain(searchedName);\r",
+							"\r",
+							"\r",
+							"})\r",
+							"const product_sku = responseBody.eContext.graphqlResponse.e248uix4m5ibqamf.items[0].sku;\r",
+							"console.log('product_sku', product_sku)\r",
+							" pm.collectionVariables.set(\"product_sku\", product_sku)\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://demo.evershop.io/search?keyword={{product_name}}&ajax=true",
+					"protocol": "https",
+					"host": [
+						"demo",
+						"evershop",
+						"io"
+					],
+					"path": [
+						"search"
+					],
+					"query": [
+						{
+							"key": "keyword",
+							"value": "{{product_name}}"
+						},
+						{
+							"key": "ajax",
+							"value": "true"
+						},
+						{
+							"key": "cookie",
+							"value": "_ga=GA1.2.1168231609.1731576119; __stripe_mid=36c776b7-ecf6-4db1-8bd3-7e74d265fe30069571; sid=s%3A-WIT2oQjaXU-JBJlJ5ugcWQ8kWJotudy.OQggvJ0cltz4OUnejdKShuPL1BzAUW9JMilCKKwgmW8",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ViewCart",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responseBody = pm.response.json();\r",
+							"pm.test(\"Validate status code should be 200\",function(){\r",
+							"    pm.expect(200).to.eql(pm.response.code)\r",
+							"})\r",
+							"var prevQty = 0;\r",
+							"try{\r",
+							" prevQty = responseBody.eContext.graphqlResponse.e248uix4m5ibqb7x.totalQty;\r",
+							"}\r",
+							"catch(err){\r",
+							"}\r",
+							"// console.log(prevQty)\r",
+							"//  prev = responseBody.eContext.graphqlResponse.eeyfrmzubim4apjv8w.totalQty;\r",
+							" console.log(prevQty);\r",
+							"pm.collectionVariables.set(\"Prev_Qty\", prevQty);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://demo.evershop.io/cart?ajax=true",
+					"protocol": "https",
+					"host": [
+						"demo",
+						"evershop",
+						"io"
+					],
+					"path": [
+						"cart"
+					],
+					"query": [
+						{
+							"key": "ajax",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "addToCart",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function getRandomNumber(min, max) {\r",
+							"    return Math.ceil(Math.random() * (max - min)) + min - 1;\r",
+							"}\r",
+							"// console.log(getRandomNumber(0,10));\r",
+							"const quantity = getRandomNumber(1,10);\r",
+							"//  console.log(quantity);\r",
+							"pm.collectionVariables.set(\"qty\",quantity);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var responsBody = pm.response.json();\r",
+							"\r",
+							"pm.test(\"Validate status code should be 200\",function(){\r",
+							"    pm.expect(200).to.eql(pm.response.code);\r",
+							"})\r",
+							"pm.test(\"Validate total quantity\",function(){\r",
+							"const actualQty = responsBody.data.item.qty;\r",
+							"const prevQty = pm.collectionVariables.get(\"Prev_Qty\")\r",
+							"const currentQty = pm.collectionVariables.get(\"qty\");\r",
+							"const expectedQty = prevQty + currentQty;\r",
+							"pm.expect(expectedQty).to.eql(actualQty);\r",
+							"})\r",
+							"\r",
+							"\r",
+							"// console.log(expectedQty)\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"qty\" : \"{{qty}}\",\r\n\"sku\" : \"{{product_sku}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://demo.evershop.io/api/cart/mine/items",
+					"protocol": "https",
+					"host": [
+						"demo",
+						"evershop",
+						"io"
+					],
+					"path": [
+						"api",
+						"cart",
+						"mine",
+						"items"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmNmZWM4MGI0MjIxOTJkOTE0YjU0OWQiLCJuYW1lIjoiTGFpbGEgU3VtaXlhIEtoYW4iLCJlbWFpbCI6Im5pbG9raGFuMjA3QGdtYWlsLmNvbSIsInBob25lIjoiODgwMTcwNDk1MTIzNyIsInBob25lX2V4dHJhIjpudWxsLCJlbWFpbF9tc2lzZG4iOm51bGwsImF2YXRhcl91cmwiOm51bGwsInJvbGUiOjAsImNvdW50X2Vucm9sbCI6MSwiaWR4IjoxMjM4NDAsImlhdCI6MTczMjYzMzA3NiwiZXhwIjoxNzMyNzE5NDc2fQ.tCdPhS_qyy8-uan-4p9xdQTnVxXPJ2tqfAXyRWb4HCg",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "access_token",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NmNmZWM4MGI0MjIxOTJkOTE0YjU0OWQiLCJuYW1lIjoiTGFpbGEgU3VtaXlhIEtoYW4iLCJlbWFpbCI6Im5pbG9raGFuMjA3QGdtYWlsLmNvbSIsInBob25lIjoiODgwMTcwNDk1MTIzNyIsInBob25lX2V4dHJhIjpudWxsLCJlbWFpbF9tc2lzZG4iOm51bGwsImF2YXRhcl91cmwiOm51bGwsInJvbGUiOjAsImNvdW50X2Vucm9sbCI6MSwiaWR4IjoxMjM4NDAsImlhdCI6MTczMjYzMzA3NiwiZXhwIjoxNzMyNzE5NDc2fQ.tCdPhS_qyy8-uan-4p9xdQTnVxXPJ2tqfAXyRWb4HCg",
+			"type": "string",
+			"disabled": true
+		},
+		{
+			"key": "product_sku",
+			"value": "",
+			"disabled": true
+		},
+		{
+			"key": "product_sku",
+			"value": ""
+		},
+		{
+			"key": "Prev_Qty",
+			"value": ""
+		},
+		{
+			"key": "qty",
+			"value": ""
+		},
+		{
+			"key": "product_name",
+			"value": "Nike+react+phantom+run+flyknit+2",
+			"type": "string"
+		}
+	]
+}
